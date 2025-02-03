@@ -12,6 +12,19 @@
 
 > ⚠️ For the **original** stream-cam-web project, visit [JiningLiu/stream-cam-web](https://github.com/JiningLiu/stream-cam-web)
 
+## Development
+
+```bash
+# install depenncies
+bun i
+
+# run in development environment
+bun dev
+
+# build for production environment
+bun run build
+```
+
 ## License
 
 Open source information to come. Planned release under the MIT License.
