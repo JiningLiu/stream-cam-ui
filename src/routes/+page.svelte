@@ -87,6 +87,7 @@
 </script>
 
 <main>
+	<!-- dropdown menu -->
 	<div id="menu-parent">
 		<input id="menu-btn" type="checkbox" name="menu" />
 		<label for="menu-btn" class="nav-btn"><span class="material-symbols-rounded">menu</span></label>
@@ -96,6 +97,7 @@
 		</div>
 	</div>
 
+	<!-- top bar -->
 	<div id="topbar">
 		<button
 			id="home"
@@ -125,6 +127,7 @@
 		</button>
 	</div>
 
+	 <!-- side bar -->
 	<div id="sidebar">
 		{#if page == Page.Home}
 			{#each HomeSections as section}
@@ -162,179 +165,17 @@
 		{/if}
 	</div>
 
+	<!-- page content -->
 	<div id="content">
 		<h1>Page</h1>
 		<p>Page content123</p>
 	</div>
 </main>
 
+<!-- too small content -->
 <div id="too-small">
 	<h1>2smol!</h1>
 	<p>Make the window bigger</p>
 </div>
 
-<style>
-	main {
-		display: grid;
-		grid-template-columns: 3rem 1fr;
-		grid-template-rows: 3rem 1fr;
-		gap: 0.6rem;
-		padding: 0.6rem;
-		width: calc(100% - 1.2rem);
-		height: calc(100% - 1.2rem);
-	}
-
-	#menu-parent,
-	#topbar,
-	#sidebar {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.2rem;
-		padding: 0.4rem;
-		background-color: var(--bg-color-2);
-	}
-
-	#menu-parent {
-		grid-row: 1;
-		grid-column: 1;
-		border-radius: 0.8rem 0.4rem 0.4rem 0.4rem;
-
-		#menu-btn {
-			display: none;
-		}
-
-		label {
-			color: var(--secondary-color);
-		}
-
-		#menu {
-			display: none;
-			position: absolute;
-			top: 3.9rem;
-			left: 0.6rem;
-			width: 10rem;
-			height: fit-content;
-			padding: 0.6rem;
-			background-color: var(--bg-color-3);
-			border-radius: 0.4rem;
-		}
-
-		#menu-btn:checked ~ #menu {
-			display: block;
-		}
-	}
-
-	#topbar,
-	#sidebar {
-		button::before {
-			content: '';
-			position: absolute;
-			opacity: 0;
-			background: var(--primary-color);
-			transition-property: opacity left width height;
-			transition: 0.2s ease-in-out;
-		}
-
-		button.selected::before {
-			opacity: 1;
-		}
-	}
-
-	#topbar {
-		flex-direction: row;
-		grid-row: 1;
-		grid-column: 2;
-		border-radius: 0.4rem 0.8rem 0.4rem 0.4rem;
-
-		button::before {
-			left: 50%;
-			bottom: -0.4rem;
-			width: 0%;
-			height: 0.2rem;
-			border-radius: 0.2rem 0.2rem 0 0;
-		}
-
-		button.selected::before {
-			left: 15%;
-			width: 70%;
-			height: 0.2rem;
-		}
-	}
-
-	#sidebar {
-		flex-direction: column;
-		grid-row: 2;
-		grid-column: 1;
-		border-radius: 0.4rem 0.4rem 0.4rem 0.8rem;
-
-		button::before {
-			top: 50%;
-			right: -0.4rem;
-			width: 0.2rem;
-			height: 0%;
-			border-radius: 0.2rem 0 0 0.2rem;
-		}
-
-		button.selected::before {
-			width: 0.2rem;
-			height: 70%;
-			top: 15%;
-		}
-	}
-
-	#content {
-		grid-row: 2;
-		grid-column: 2;
-		padding: 0.4rem;
-		background-color: var(--bg-color-2);
-		border-radius: 0.4rem 0.4rem 0.8rem 0.4rem;
-	}
-
-	.nav-btn {
-		color: var(--primary-color);
-		display: flex;
-		position: relative;
-		align-items: center;
-		justify-content: center;
-		width: 2.2rem;
-		height: 2.2rem;
-		background: var(--bg-color-2);
-		border: none;
-		border-radius: 0.4rem;
-		cursor: pointer;
-		-webkit-user-select: none;
-		user-select: none;
-		transition: background 0.2s;
-	}
-
-	.nav-btn:hover {
-		background: var(--bg-color-3);
-	}
-
-	#too-small {
-		position: absolute;
-		top: 0;
-		left: 0;
-		padding: 0.4rem;
-		width: calc(100% - 0.8rem);
-		height: calc(100% - 0.8rem);
-		z-index: 9999;
-		display: none;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		text-align: center;
-		background: var(--bg-color-4);
-	}
-
-	@media (max-width: 12.5rem) or (max-height: 18rem) {
-		main {
-			display: none;
-		}
-
-		#too-small {
-			display: flex;
-		}
-	}
-</style>
+<style>	@import 'styles.css';</style>
