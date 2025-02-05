@@ -127,7 +127,7 @@
 		</button>
 	</div>
 
-	 <!-- side bar -->
+	<!-- side bar -->
 	<div id="sidebar">
 		{#if page == Page.Home}
 			{#each HomeSections as section}
@@ -178,4 +178,6 @@
 	<p>Make the window bigger</p>
 </div>
 
-<style>	@import 'styles.css';</style>
+<style>
+	@import 'styles.css';
+</style>
