@@ -199,8 +199,8 @@
 		grid-template-rows: 3rem 1fr;
 		gap: 0.6rem;
 		padding: 0.6rem;
-		width: calc(100% - 1.2rem);
-		height: calc(100% - 1.2rem);
+		width: 100%;
+		height: 100%;
 	}
 
 	#menu-parent,
@@ -311,6 +311,7 @@
 		iframe {
 			width: 100%;
 			height: 100%;
+			border-radius: 0.4rem 0.4rem 0.8rem 0.4rem;
 		}
 	}
 
@@ -340,8 +341,8 @@
 		top: 0;
 		left: 0;
 		padding: 0.4rem;
-		width: calc(100% - 0.8rem);
-		height: calc(100% - 0.8rem);
+		width: 100%;
+		height: 100%;
 		z-index: 9999;
 		display: none;
 		flex-direction: column;
@@ -351,7 +352,7 @@
 		background: var(--bg-color-4);
 	}
 
-	@media (max-width: 12.5rem) or (max-height: 18rem) {
+	@media (max-width: 24rem) or (max-height: 18rem) {
 		main {
 			display: none;
 		}
