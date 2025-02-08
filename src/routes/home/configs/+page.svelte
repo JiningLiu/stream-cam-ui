@@ -27,17 +27,43 @@
 			});
 			const currentSettings = (await currentRes.json()) as CameraSettings;
 			editingSettings = currentSettings;
+			settingsSelection = editingSettings.id;
+			changeEditingSettings();
 		} catch {}
 	});
 
 	const changesMade = () => {
-		return (
-			JSON.stringify(editingSettings) !=
-			JSON.stringify(allSettings.find((setting) => setting.id === editingSettings.id))
-		);
+		const found = allSettings.find((setting) => setting.id === editingSettings.id);
+		if (!found) return false;
+		return JSON.stringify(editingSettings) != JSON.stringify(found);
 	};
 
 	function changeEditingSettings() {
+		if (settingsSelection === 'new') {
+			editingSettings = new CameraSettings();
+			allSettings.push(JSON.parse(JSON.stringify(editingSettings)));
+			settingsSelection = editingSettings.id;
+
+			fetch(`${protocol}//${hostname}:20240/camera/settings/add`, {
+				method: 'POST',
+				body: JSON.stringify(editingSettings)
+			});
+			return;
+		}
+
+		if (settingsSelection === 'delete') {
+			const id = editingSettings.id;
+			allSettings = allSettings.filter((setting) => setting.id !== id);
+			settingsSelection = 'none';
+			editingSettings = new CameraSettings();
+
+			fetch(`${protocol}//${hostname}:20240/camera/settings/delete`, {
+				method: 'DELETE',
+				body: id
+			});
+			return;
+		}
+
 		if (changesMade()) {
 			if (
 				!confirm('You have unsaved changes for the current configuration. Discard these changes?')
@@ -96,83 +122,94 @@
 			bind:value={settingsSelection}
 			on:change={changeEditingSettings}
 		>
+			<option value="none" disabled selected hidden> Select a configuration... </option>
+
 			{#each allSettings as setting}
 				<option value={setting.id} selected={setting.id === editingSettings.id}>
 					{setting.name}{changesMade() && setting.id === editingSettings.id ? '*' : ''}
 				</option>
 			{/each}
+
+			<optgroup label="Actions">
+				<option value="new">New...</option>
+				<option value="delete">Delete</option>
+			</optgroup>
 		</select>
 
-		{#if changesMade()}
-			<button id="save-btn" on:click={saveSettings}>Save</button>
-		{:else}
-			<button id="apply-btn" on:click={applySettings}>Apply</button>
+		{#if settingsSelection !== 'none'}
+			{#if changesMade()}
+				<button id="save-btn" on:click={saveSettings}>Save</button>
+			{:else}
+				<button id="apply-btn" on:click={applySettings}>Apply</button>
+			{/if}
 		{/if}
 	</div>
 
-	<div id="configs">
-		<div class="hstack vcenter space-between w100">
-			<p>Name</p>
-			<input type="text" name="configName" id="configName" bind:value={editingSettings.name} />
-		</div>
+	{#if settingsSelection !== 'none'}
+		<div id="configs">
+			<div class="hstack vcenter space-between w100">
+				<p>Name</p>
+				<input type="text" name="configName" id="configName" bind:value={editingSettings.name} />
+			</div>
 
-		<div class="hstack vcenter space-between w100">
-			<p>Camera Port ID</p>
-			<input
-				type="number"
-				min="0"
-				name="camId"
-				id="camId"
-				bind:value={editingSettings.camId}
-				on:keydown={(event) => {
-					if (
-						event.key === 'Backspace' ||
-						event.key === 'ArrowLeft' ||
-						event.key === 'ArrowRight' ||
-						event.key === 'ArrowUp' ||
-						event.key === 'ArrowDown' ||
-						event.key === 'Tab'
-					)
-						return;
-					if (event.key < '0' || event.key > '9') {
-						event.preventDefault();
-					}
-				}}
-			/>
-		</div>
+			<div class="hstack vcenter space-between w100">
+				<p>Camera Port ID</p>
+				<input
+					type="number"
+					min="0"
+					name="camId"
+					id="camId"
+					bind:value={editingSettings.camId}
+					on:keydown={(event) => {
+						if (
+							event.key === 'Backspace' ||
+							event.key === 'ArrowLeft' ||
+							event.key === 'ArrowRight' ||
+							event.key === 'ArrowUp' ||
+							event.key === 'ArrowDown' ||
+							event.key === 'Tab'
+						)
+							return;
+						if (event.key < '0' || event.key > '9') {
+							event.preventDefault();
+						}
+					}}
+				/>
+			</div>
 
-		<div class="hstack vcenter space-between w100">
-			<p>Flip Horizontally</p>
-			<label class="switch">
-				<input type="checkbox" bind:checked={editingSettings.hFlip} />
-				<span class="slider round"></span>
-			</label>
-		</div>
+			<div class="hstack vcenter space-between w100">
+				<p>Flip Horizontally</p>
+				<label class="switch">
+					<input type="checkbox" bind:checked={editingSettings.hFlip} />
+					<span class="slider round"></span>
+				</label>
+			</div>
 
-		<div class="hstack vcenter space-between w100">
-			<p>Flip Vertically</p>
-			<label class="switch">
-				<input type="checkbox" bind:checked={editingSettings.vFlip} />
-				<span class="slider round"></span>
-			</label>
-		</div>
+			<div class="hstack vcenter space-between w100">
+				<p>Flip Vertically</p>
+				<label class="switch">
+					<input type="checkbox" bind:checked={editingSettings.vFlip} />
+					<span class="slider round"></span>
+				</label>
+			</div>
 
-		<div class="hstack vcenter space-between w100">
-			<p>HDR</p>
-			<label class="switch">
-				<input type="checkbox" bind:checked={editingSettings.hdr} />
-				<span class="slider round"></span>
-			</label>
-		</div>
+			<div class="hstack vcenter space-between w100">
+				<p>HDR</p>
+				<label class="switch">
+					<input type="checkbox" bind:checked={editingSettings.hdr} />
+					<span class="slider round"></span>
+				</label>
+			</div>
 
-		<div class="hstack vcenter space-between w100">
-			<p>Text Overlay</p>
-			<label class="switch">
-				<input type="checkbox" bind:checked={editingSettings.textOverlayEnable} />
-				<span class="slider round"></span>
-			</label>
+			<div class="hstack vcenter space-between w100">
+				<p>Text Overlay</p>
+				<label class="switch">
+					<input type="checkbox" bind:checked={editingSettings.textOverlayEnable} />
+					<span class="slider round"></span>
+				</label>
+			</div>
 		</div>
-	</div>
+	{/if}
 </main>
 
 <style>
