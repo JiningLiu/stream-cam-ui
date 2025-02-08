@@ -66,6 +66,24 @@
 			body: JSON.stringify(editingSettings)
 		});
 	}
+
+	async function applySettings() {
+		const statusRes = await fetch(`${protocol}//${hostname}:20240/camera/status`, {
+			method: 'GET'
+		});
+		const statusJson: { mediamtx: boolean; audiosource: boolean } = await statusRes.json();
+		const originallyOn = statusJson.mediamtx;
+
+		await fetch(`${protocol}//${hostname}:20240/camera/off`, { method: 'POST' });
+		await fetch(`${protocol}//${hostname}:20240/camera/settings/set`, {
+			method: 'POST',
+			body: settingsSelection
+		});
+
+		if (originallyOn) {
+			await fetch(`${protocol}//${hostname}:20240/camera/on`, { method: 'POST' });
+		}
+	}
 </script>
 
 <main>
@@ -87,6 +105,8 @@
 
 		{#if changesMade()}
 			<button id="save-btn" on:click={saveSettings}>Save</button>
+		{:else}
+			<button id="apply-btn" on:click={applySettings}>Apply</button>
 		{/if}
 	</div>
 
@@ -190,7 +210,7 @@
 		background: var(--bg-color-4);
 	}
 
-	#save-btn {
+	button {
 		color: white;
 		display: flex;
 		flex-direction: row;
@@ -200,15 +220,27 @@
 		font-weight: 600;
 		height: 100%;
 		padding: 0.3rem 0.5rem;
-		background: #1177ccdd;
 		border-radius: 0.4rem;
 		border: none;
+		cursor: pointer;
 		transition-property: color background;
 		transition: 0.2s;
 	}
 
+	#save-btn {
+		background: #1177ccdd;
+	}
+
 	#save-btn:hover {
 		background: #1177cc;
+	}
+
+	#apply-btn {
+		background: #bb4422dd;
+	}
+
+	#apply-btn:hover {
+		background: #bb4422;
 	}
 
 	#configs {

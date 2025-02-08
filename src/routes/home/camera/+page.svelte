@@ -13,6 +13,7 @@
 	onMount(() => {
 		protocol = location.protocol;
 		hostname = location.hostname;
+		status();
 	});
 
 	function on() {
@@ -40,6 +41,7 @@
 		if (camera) {
 			camera.src = `${protocol}//${hostname}:8889/cam${viewWithMic ? '_with_audio' : ''}`;
 		}
+		status();
 	}
 
 	function viewWithMicToggle() {
@@ -51,6 +53,16 @@
 		if (camera) {
 			navigator.clipboard.writeText(camera.src);
 		}
+	}
+
+	function status() {
+		fetch(`${protocol}//${hostname}:20240/camera/status`, { method: 'GET' })
+			.then((res) => res.json())
+			.then((json: { mediamtx: boolean; audiosource: boolean }) => {
+				console.log(json);
+				camIsOn = json.mediamtx;
+				micIsOn = json.audiosource;
+			});
 	}
 </script>
 
