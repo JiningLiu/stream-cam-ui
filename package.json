@@ -33,6 +33,7 @@
     "vite": "^6.0.0"
   },
   "dependencies": {
-    "material-symbols": "latest"
+    "material-symbols": "latest",
+    "uuid": "^11.0.5"
   }
 }

@@ -122,8 +122,9 @@
 			display: grid;
 			gap: 0.4rem;
 
-			button:hover,
-			.selected {
+			button:hover:not(#copy-url),
+			.selected:not(#copy-url) {
+				cursor: pointer;
 				color: #fff;
 			}
 
@@ -168,7 +169,7 @@
 			grid-template-columns: 1fr 1fr auto;
 
 			#reload:hover {
-				background: #3355cc;
+				background: #1177cc;
 			}
 
 			#view-with-mic.selected {
@@ -180,6 +181,7 @@
 			}
 
 			#copy-url:hover {
+				cursor: pointer;
 				background: var(--bg-color-4);
 			}
 		}
