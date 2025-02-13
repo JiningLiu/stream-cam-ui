@@ -1,6 +1,6 @@
 <script lang="ts">
 	import 'material-symbols';
-	import { CameraSettings } from '$lib/CameraSettings';
+	import { AFRange, AFSpeed, CameraSettings, Codec, Denoise, Exposure, FocusMode, Metering, SensorMode, WhiteBalance } from '$lib/CameraSettings';
 	import { onMount } from 'svelte';
 
 	let protocol: string | undefined;
@@ -51,11 +51,27 @@
 			return;
 		}
 
+		if (settingsSelection === 'duplicate') {
+			const newSettings = JSON.parse(JSON.stringify(editingSettings));
+			newSettings.id = new CameraSettings().id;
+			newSettings.name += ' (Copy)';
+			editingSettings = newSettings;
+			allSettings.push(JSON.parse(JSON.stringify(editingSettings)));
+			settingsSelection = newSettings.id;
+
+			fetch(`${protocol}//${hostname}:20240/camera/settings/add`, {
+				method: 'POST',
+				body: JSON.stringify(newSettings)
+			});
+			return;
+		}
+
 		if (settingsSelection === 'delete') {
 			const id = editingSettings.id;
 			allSettings = allSettings.filter((setting) => setting.id !== id);
-			settingsSelection = 'none';
-			editingSettings = new CameraSettings();
+			const select = allSettings[0];
+			settingsSelection = select?.id ?? 'none';
+			editingSettings = select ? JSON.parse(JSON.stringify(select)) : new CameraSettings();
 
 			fetch(`${protocol}//${hostname}:20240/camera/settings/delete`, {
 				method: 'DELETE',
@@ -132,7 +148,10 @@
 
 			<optgroup label="Actions">
 				<option value="new">New...</option>
-				<option value="delete">Delete</option>
+				{#if settingsSelection !== 'none'}
+					<option value="duplicate">Duplicate</option>
+					<option value="delete">Delete</option>
+				{/if}
 			</optgroup>
 		</select>
 
@@ -156,24 +175,41 @@
 				<p>Camera Port ID</p>
 				<input
 					type="number"
+					inputmode="numeric"
+					pattern="\d*"
 					min="0"
 					name="camId"
 					id="camId"
+					class="small"
 					bind:value={editingSettings.camId}
-					on:keydown={(event) => {
-						if (
-							event.key === 'Backspace' ||
-							event.key === 'ArrowLeft' ||
-							event.key === 'ArrowRight' ||
-							event.key === 'ArrowUp' ||
-							event.key === 'ArrowDown' ||
-							event.key === 'Tab'
-						)
-							return;
-						if (event.key < '0' || event.key > '9') {
-							event.preventDefault();
-						}
-					}}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Frame Width</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="0"
+					max="1920"
+					name="width"
+					id="width"
+					bind:value={editingSettings.width}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Frame Height</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="0"
+					max="1080"
+					name="height"
+					id="height"
+					bind:value={editingSettings.height}
 				/>
 			</div>
 
@@ -194,11 +230,300 @@
 			</div>
 
 			<div class="hstack vcenter space-between w100">
+				<p>Brightness</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="-1"
+					max="1"
+					name="brightness"
+					id="brightness"
+					class="small"
+					bind:value={editingSettings.brightness}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Contrast</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="0"
+					max="16"
+					name="contrast"
+					id="contrast"
+					class="small"
+					bind:value={editingSettings.contrast}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Saturation</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="0"
+					max="16"
+					name="saturation"
+					id="saturation"
+					class="small"
+					bind:value={editingSettings.saturation}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Sharpness</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="0"
+					max="16"
+					name="sharpness"
+					id="sharpness"
+					class="small"
+					bind:value={editingSettings.sharpness}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Exposure Mode</p>
+				<select
+					name="exposure"
+					id="exposure"
+					bind:value={editingSettings.exposure}
+				>
+					{#each Object.values(Exposure) as mode}
+						<option value={mode} selected={mode === editingSettings.exposure}>{mode}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>White Balance</p>
+				<select
+					name="whiteBalance"
+					id="whiteBalance"
+					bind:value={editingSettings.whiteBalance}
+				>
+					{#each Object.values(WhiteBalance) as mode}
+						<option value={mode} selected={mode === editingSettings.whiteBalance}>{mode}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>AWB Gains</p>
+
+				<div class="hstack vcenter g04">
+					<p>Blue</p>
+					<input
+						type="number"
+						inputmode="numeric"
+						pattern="\d*"
+						min="-1"
+						max="1"
+						name="awbGainsBlue"
+						id="awbGainsBlue"
+						class="small"
+						bind:value={editingSettings.awbGains.blue}
+					/>
+					<p>&nbsp;Red</p>
+					<input
+						type="number"
+						inputmode="numeric"
+						pattern="\d*"
+						min="-1"
+						max="1"
+						name="awbGainsRed"
+						id="awbGainsRed"
+						class="small"
+						bind:value={editingSettings.awbGains.red}
+					/>
+				</div>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Denoise</p>
+				<select
+					name="denoise"
+					id="denoise"
+					bind:value={editingSettings.denoise}
+				>
+					{#each Object.values(Denoise) as mode}
+						<option value={mode} selected={mode === editingSettings.denoise}>{mode}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Shutter Speed</p>
+				<div class="hstack vcenter">
+					<input
+						type="number"
+						inputmode="numeric"
+						pattern="\d*"
+						min="0"
+						max="1000000"
+						name="sharpness"
+						id="sharpness"
+						bind:value={editingSettings.shutterSpeed}
+					/>
+					<p>&nbsp;µs</p>
+				</div>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Metering Mode</p>
+				<select
+					name="metering"
+					id="metering"
+					bind:value={editingSettings.metering}
+				>
+					{#each Object.values(Metering) as mode}
+						<option value={mode} selected={mode === editingSettings.metering}>{mode}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Gain</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="-1"
+					max="1"
+					name="gain"
+					id="gain"
+					class="small"
+					bind:value={editingSettings.gain}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>EV Compensation</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="-10"
+					max="10"
+					step="0.1"
+					name="ev"
+					id="ev"
+					class="small"
+					bind:value={editingSettings.ev}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
 				<p>HDR</p>
 				<label class="switch">
 					<input type="checkbox" bind:checked={editingSettings.hdr} />
 					<span class="slider round"></span>
 				</label>
+			</div>
+
+			<!-- insert roi -->
+
+			<!-- insert tuning file -->
+
+			<!-- insert sensor mode -->
+
+			<div class="hstack vcenter space-between w100">
+				<p>FPS</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="1"
+					max="120"
+					name="fps"
+					id="fps"
+					class="small"
+					bind:value={editingSettings.fps}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Focus Mode</p>
+				<select
+					name="focusMode"
+					id="focusMode"
+					bind:value={editingSettings.focusMode}
+				>
+					{#each Object.values(FocusMode) as mode}
+						<option value={mode} selected={mode === editingSettings.focusMode}>{mode}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>AF Range</p>
+				<select
+					name="afRange"
+					id="afRange"
+					bind:value={editingSettings.afRange}
+				>
+					{#each Object.values(AFRange) as mode}
+						<option value={mode} selected={mode === editingSettings.afRange}>{mode}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>AF Speed</p>
+				<select
+					name="afSpeed"
+					id="afSpeed"
+					bind:value={editingSettings.afSpeed}
+				>
+					{#each Object.values(AFSpeed) as mode}
+						<option value={mode} selected={mode === editingSettings.afSpeed}>{mode}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>MF Lens Position</p>
+				<div class="hstack vcenter">
+					<p>1/(</p>
+					<input
+						type="number"
+						inputmode="numeric"
+						pattern="\d*"
+						min="0"
+						max="20"
+						name="mfLensPosition"
+						id="mfLensPosition"
+						class="small"
+						bind:value={editingSettings.mfLensPosition}
+					/>
+					<p>&nbsp;m)</p>
+				</div>
+			</div>
+
+			<!-- insert af window -->
+
+			<div class="hstack vcenter space-between w100">
+				<p>Flicker Correction Period</p>
+				<div class="hstack vcenter">
+					<input
+						type="number"
+						inputmode="numeric"
+						pattern="\d*"
+						min="0"
+						max="1000000"
+						name="flickerPeriod"
+						id="flickerPeriod"
+						bind:value={editingSettings.flickerPeriod}
+					/>
+					<p>&nbsp;µs</p>
+				</div>
 			</div>
 
 			<div class="hstack vcenter space-between w100">
@@ -207,6 +532,73 @@
 					<input type="checkbox" bind:checked={editingSettings.textOverlayEnable} />
 					<span class="slider round"></span>
 				</label>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Overlay Text Content</p>
+				<input
+					type="text"
+					name="textOverlay"
+					id="textOverlay"
+					bind:value={editingSettings.textOverlay}
+				/>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Codec</p>
+				<select
+					name="codec"
+					id="codec"
+					bind:value={editingSettings.codec}
+				>
+					{#each Object.values(Codec) as mode}
+						<option value={mode} selected={mode === editingSettings.codec}>{mode}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>IDR Period</p>
+				<div class="hstack vcenter">
+					<input
+						type="number"
+						inputmode="numeric"
+						pattern="\d*"
+						min="0"
+						max="1000000"
+						name="flickerPeriod"
+						id="flickerPeriod"
+						bind:value={editingSettings.flickerPeriod}
+					/>
+					<p>&nbsp;µs</p>
+				</div>
+			</div>
+
+			<div class="hstack vcenter space-between w100">
+				<p>Bitrate</p>
+				<input
+					type="number"
+					inputmode="numeric"
+					pattern="\d*"
+					min="10000"
+					max="100000000"
+					name="bitrate"
+					id="bitrate"
+					bind:value={editingSettings.bitrate}
+				/>
+			</div>
+
+			<!-- insert profile -->
+
+			<div class="hstack vcenter space-between w100">
+				<p>H264 Level</p>
+				<input
+					type="text"
+					name="h264Level"
+					id="h264Level"
+					class="small"
+					bind:value={editingSettings.h264Level}
+				/>
 			</div>
 		</div>
 	{/if}
@@ -220,15 +612,13 @@
 	main {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
 		gap: 0.4rem;
 		width: 100%;
 		height: 100%;
-		padding: 0.4rem;
+		padding: 0.8rem;
 	}
 
-	#config-select {
-		width: 100%;
+	select {
 		padding: 0.2rem;
 		color: var(--primary-color);
 		font-family: Inter, sans-serif;
@@ -241,6 +631,10 @@
 		border: none;
 		border-radius: 0.4rem;
 		transition: background 0.2s;
+	}
+
+	#config-select {
+		width: 100%;
 	}
 
 	#config-select:hover {
@@ -288,6 +682,10 @@
 			position: relative;
 		}
 
+		div:hover {
+			background: var(--bg-color-3);
+		}
+
 		div::after {
 			content: '';
 			position: absolute;
@@ -296,6 +694,10 @@
 			right: 0;
 			bottom: -0.3rem;
 			background: var(--bg-color-3);
+		}
+
+		:last-child::after {
+			opacity: 0;
 		}
 
 		input[type='number'],
@@ -310,8 +712,19 @@
 		}
 
 		input[type='number'] {
-			width: 3rem;
-			text-align: center;
+			width: 8rem;
+		}
+
+		input[type='text'] {
+			width: min(50%, 48rem);
+		}
+
+		input.small {
+			width: 4rem;
+		}
+
+		select {
+			width: 10rem;
 		}
 	}
 </style>

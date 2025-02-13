@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import 'material-symbols';
 
 	enum Page {
@@ -80,19 +81,79 @@
 		}
 	}
 
+	let pageSetup = false;
 	let page = Page.Home;
 	let section = HomeSection.Camera.toString();
 	let homeSection = HomeSection.Camera;
 	let extensionsSection = ExtensionsSection.Installed;
 	let settingsSection = SettingsSection.General;
 
+	let protocol: string | undefined;
+	let hostname: string | undefined;
+
+	onMount(() => {
+		protocol = location.protocol;
+		hostname = location.hostname;
+
+		pageSetup = true;
+
+		const path = location.hash.split('#')[1];
+		const urlPage = path.split('/')[0];
+		const urlSection = path.split('/')[1];
+
+		if (Object.values(Page).includes(urlPage as Page)) {
+			page = urlPage as Page;
+			if (Object.values(HomeSection).includes(urlSection as HomeSection)) {
+				homeSection = urlSection as HomeSection;
+				section = urlSection;
+				return;
+			}
+
+			if (Object.values(ExtensionsSection).includes(urlSection as ExtensionsSection)) {
+				extensionsSection = urlSection as ExtensionsSection;
+				section = urlSection;
+				return;
+			}
+
+			if (Object.values(SettingsSection).includes(urlSection as SettingsSection)) {
+				settingsSection = urlSection as SettingsSection;
+				section = urlSection;
+				return;
+			}
+		}
+	});
+
 	$: {
-		if (page === Page.Home) {
-			section = homeSection;
-		} else if (page === Page.Extensions) {
-			section = extensionsSection;
-		} else if (page === Page.Settings) {
-			section = settingsSection;
+		if (pageSetup) {
+			if (page === Page.Home) {
+				section = homeSection;
+			} else if (page === Page.Extensions) {
+				section = extensionsSection;
+			} else if (page === Page.Settings) {
+				section = settingsSection;
+			}
+
+			if (typeof window !== 'undefined' && window.location) {
+				window.location.hash = `#${page}/${section}`;
+			}
+		}
+	}
+
+	function restart() {
+		if (confirm('Restart stream-can Services?')) {
+			fetch(`${protocol}//${hostname}:20240/services/restart`, { method: 'POST' });
+		}
+	}
+
+	function reboot() {
+		if (confirm('Reboot Raspberry Pi?')) {
+			fetch(`${protocol}//${hostname}:20240/device/reboot`, { method: 'POST' });
+		}
+	}
+
+	function shutdown() {
+		if (confirm('Shutdown Raspberry Pi?')) {
+			fetch(`${protocol}//${hostname}:20240/device/shutdown`, { method: 'POST' });
 		}
 	}
 </script>
@@ -104,7 +165,18 @@
 		<label for="menu-btn" class="nav-btn"><span class="material-symbols-rounded">menu</span></label>
 
 		<div id="menu">
-			<p>A dropdown menu</p>
+			<button id="restart" on:click={restart}>
+				<span class="material-symbols-rounded">sync</span>
+				&nbsp; Restart Services
+			</button>
+			<button id="reboot" on:click={reboot}>
+				<span class="material-symbols-rounded">restart_alt</span>
+				&nbsp; Reboot
+			</button>
+			<button id="shutdown" on:click={shutdown}>
+				<span class="material-symbols-rounded">power_settings_new</span>
+				&nbsp; Shutdown
+			</button>
 		</div>
 	</div>
 
@@ -211,7 +283,7 @@
 		justify-content: center;
 		gap: 0.2rem;
 		padding: 0.4rem;
-		background-color: var(--bg-color-2);
+		background: var(--bg-color-2);
 	}
 
 	#menu-parent {
@@ -232,11 +304,51 @@
 			position: absolute;
 			top: 3.9rem;
 			left: 0.6rem;
-			width: 10rem;
+			width: 12rem;
 			height: fit-content;
-			padding: 0.6rem;
-			background-color: var(--bg-color-3);
+			padding: 0.4rem;
+			background: var(--bg-color-3);
+			box-shadow: 0 0 4rem var(--shadow-color);
 			border-radius: 0.4rem;
+
+			button {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				width: 100%;
+				padding: 0.4rem;
+				color: var(--primary-color);
+				font-size: 1rem;
+				font-weight: 500;
+				text-align: right;
+				background: var(--bg-color-3);
+				border: none;
+				border-radius: 0.4rem;
+				cursor: pointer;
+				-webkit-user-select: none;
+				user-select: none;
+				transition: background 0.2s;
+
+				span {
+					transition: color 0.2s;
+				}
+			}
+
+			#restart:hover span {
+				color: #1177cc;
+			}
+
+			#reboot:hover span {
+				color: #dd8822;
+			}
+
+			#shutdown:hover span {
+				color: #bb4422;
+			}
+
+			button:hover {
+				background: var(--bg-color-2);
+			}
 		}
 
 		#menu-btn:checked ~ #menu {
@@ -305,7 +417,7 @@
 	#content {
 		grid-row: 2;
 		grid-column: 2;
-		background-color: var(--bg-color-2);
+		background: var(--bg-color-2);
 		border-radius: 0.4rem 0.4rem 0.8rem 0.4rem;
 
 		iframe {

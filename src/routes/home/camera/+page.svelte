@@ -8,7 +8,7 @@
 	let camIsOn = false;
 	let micIsOn = false;
 
-	let viewWithMic = true;
+	let viewWithMic = false;
 
 	onMount(() => {
 		protocol = location.protocol;
@@ -165,7 +165,7 @@
 			}
 
 			#on:hover {
-				background: #33aa44ff;
+				background: #33aa44;
 			}
 
 			#off.selected {
@@ -173,7 +173,7 @@
 			}
 
 			#off:hover {
-				background: #bb4422ff;
+				background: #bb4422;
 			}
 		}
 
@@ -189,7 +189,7 @@
 			}
 
 			#view-with-mic:hover {
-				background: #dd8822ff;
+				background: #dd8822;
 			}
 
 			#copy-url:hover {
