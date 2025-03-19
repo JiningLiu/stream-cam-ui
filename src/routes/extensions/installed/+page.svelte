@@ -9,7 +9,6 @@
 
 	let selected: string | undefined;
 	let enabled: boolean | undefined;
-	let refresh: number | undefined;
 
 	onMount(async () => {
 		protocol = location.protocol;
@@ -27,21 +26,10 @@
 	function configureExtension(extension: string) {
 		enabled = undefined;
 		selected = extension;
-
-		refresh = setInterval(async () => {
-			const res = await fetch(`${protocol}//${hostname}:6400/status/${extension}`, {
-				method: 'GET'
-			});
-			const json = await res.json();
-			enabled = json['isOn'];
-		}, 1000);
 	}
 
-	$: {
-		if (selected == undefined) {
-			clearInterval(refresh);
-			refresh = undefined;
-		}
+	function delay(ms: number): Promise<void> {
+		return new Promise((resolve) => setTimeout(resolve, ms));
 	}
 </script>
 
@@ -80,10 +68,18 @@
 						<input
 							type="checkbox"
 							bind:checked={enabled}
-							on:change={() => {
-								fetch(`${protocol}//${hostname}:6400/toggle/${selected}`, {
+							on:change={async () => {
+								await fetch(`${protocol}//${hostname}:6400/toggle/${selected}`, {
 									method: 'POST'
 								});
+
+								await delay(500);
+
+								const res = await fetch(`${protocol}//${hostname}:6400/status/${selected}`, {
+									method: 'GET'
+								});
+								const json = await res.json();
+								enabled = json['isOn'];
 							}}
 						/>
 						<span class="slider round"></span>
@@ -92,7 +88,11 @@
 					???
 				{/if}
 			</div>
-			<button on:click={() => { selected = undefined }}>[X]</button>
+			<button
+				on:click={() => {
+					selected = undefined;
+				}}>[X]</button
+			>
 		</container>
 	</config>
 {/if}
