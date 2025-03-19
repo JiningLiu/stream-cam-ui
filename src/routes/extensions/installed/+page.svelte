@@ -23,9 +23,14 @@
 		} catch {}
 	});
 
-	function configureExtension(extension: string) {
+	async function configureExtension(extension: string) {
 		enabled = undefined;
 		selected = extension;
+		const res = await fetch(`${protocol}//${hostname}:6400/status/${selected}`, {
+			method: 'GET'
+		});
+		const json = await res.json();
+		enabled = json['isOn'];
 	}
 
 	function delay(ms: number): Promise<void> {
