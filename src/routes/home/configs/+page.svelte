@@ -627,7 +627,7 @@
 		font-feature-settings:
 			'calt' 0,
 			'case' 0;
-		background: var(--bg-color-3);
+		background: var(--bg-color-4);
 		border: none;
 		border-radius: 0.4rem;
 		transition: background 0.2s;
@@ -638,7 +638,7 @@
 	}
 
 	#config-select:hover {
-		background: var(--bg-color-4);
+		background: var(--bg-color-5);
 	}
 
 	button {
@@ -683,7 +683,7 @@
 		}
 
 		div:hover {
-			background: var(--bg-color-3);
+			background: var(--bg-color-4);
 		}
 
 		div::after {
@@ -693,7 +693,7 @@
 			height: 0.05rem;
 			right: 0;
 			bottom: -0.3rem;
-			background: var(--bg-color-3);
+			background: var(--bg-color-4);
 		}
 
 		:last-child::after {
@@ -705,7 +705,7 @@
 			padding: 0.2rem 0.4rem;
 			border: none;
 			border-radius: 0.2rem;
-			background: var(--bg-color-3);
+			background: var(--bg-color-4);
 			color: var(--primary-color);
 			font-size: 1rem;
 			font-weight: 600;

@@ -283,7 +283,7 @@
 		justify-content: center;
 		gap: 0.2rem;
 		padding: 0.4rem;
-		background: var(--bg-color-2);
+		background: var(--bg-color-3);
 	}
 
 	#menu-parent {
@@ -307,7 +307,7 @@
 			width: 12rem;
 			height: fit-content;
 			padding: 0.4rem;
-			background: var(--bg-color-3);
+			background: var(--bg-color-4);
 			box-shadow: 0 0 4rem var(--shadow-color);
 			border-radius: 0.4rem;
 
@@ -321,7 +321,7 @@
 				font-size: 1rem;
 				font-weight: 500;
 				text-align: right;
-				background: var(--bg-color-3);
+				background: var(--bg-color-4);
 				border: none;
 				border-radius: 0.4rem;
 				cursor: pointer;
@@ -347,7 +347,7 @@
 			}
 
 			button:hover {
-				background: var(--bg-color-2);
+				background: var(--bg-color-3);
 			}
 		}
 
@@ -417,7 +417,7 @@
 	#content {
 		grid-row: 2;
 		grid-column: 2;
-		background: var(--bg-color-2);
+		background: var(--bg-color-3);
 		border-radius: 0.4rem 0.4rem 0.8rem 0.4rem;
 
 		iframe {
@@ -435,7 +435,7 @@
 		justify-content: center;
 		width: 2.2rem;
 		height: 2.2rem;
-		background: var(--bg-color-2);
+		background: var(--bg-color-3);
 		border: none;
 		border-radius: 0.4rem;
 		cursor: pointer;
@@ -445,7 +445,7 @@
 	}
 
 	.nav-btn:hover {
-		background: var(--bg-color-3);
+		background: var(--bg-color-4);
 	}
 
 	#too-small {
@@ -461,7 +461,7 @@
 		justify-content: center;
 		align-items: center;
 		text-align: center;
-		background: var(--bg-color-4);
+		background: var(--bg-color-5);
 	}
 
 	@media (max-width: 24rem) or (max-height: 18rem) {

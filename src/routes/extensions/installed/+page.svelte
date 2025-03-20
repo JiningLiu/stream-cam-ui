@@ -124,7 +124,7 @@
 		width: 100%;
 		height: 10rem;
 		padding: 0.8rem;
-		background: var(--bg-color-3);
+		background: var(--bg-color-4);
 		border-radius: 0.4rem;
 
 		.info {
@@ -238,14 +238,14 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: #66666666;
+		background: #1118;
 
 		container {
-			width: min(80vw, 60rem);
-			height: min(80vh, 40rem);
+			width: min(80vw, 40rem);
+			height: min(80vh, 60rem);
 			padding: 1rem;
 			background: var(--bg-color-1);
-			box-shadow: 0 0 2rem #66666666;
+			box-shadow: 0 0 2rem #2222;
 			border-radius: 1rem;
 		}
 	}

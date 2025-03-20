@@ -149,7 +149,7 @@
 				font-size: 1rem;
 				font-weight: 600;
 				padding: 0.4rem 0.6rem;
-				background: var(--bg-color-3);
+				background: var(--bg-color-4);
 				border-radius: 0.4rem;
 				border: none;
 				transition-property: color background;
@@ -194,7 +194,7 @@
 
 			#copy-url:hover {
 				cursor: pointer;
-				background: var(--bg-color-4);
+				background: var(--bg-color-5);
 			}
 		}
 	}
@@ -224,7 +224,7 @@
 		width: 100%;
 		height: 100%;
 		z-index: -1;
-		background: var(--bg-color-3);
+		background: var(--bg-color-4);
 		border-radius: 0.4rem;
 	}
 </style>
