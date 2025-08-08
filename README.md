@@ -8,7 +8,7 @@
 </b>
 </p>
 
-> ### 🚧 This project is in early development. Please check back for more information.
+> ### This project was ended in early development. There is no planned successor.
 
 > ⚠️ For the **original** stream-cam-web project, visit [JiningLiu/stream-cam-web](https://github.com/JiningLiu/stream-cam-web)
 
